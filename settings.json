@@ -11,5 +11,5 @@
   "log_file": "/home/ronald/debug.log",
   "csv_file": "/home/ronald/flights-%m.csv",
   "history_file": "/home/ronald/history.json",
-  "keep_history": 30
+  "keep_history": 3600
 }

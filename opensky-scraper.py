@@ -43,7 +43,7 @@ class Flight:
         self.data = flight_data
 
     def get(self, item, default):
-        return self.data[self.fields.get(item)]
+        return self.__getattr__(item)
 
     def __getattr__(self, item):
         if item in ["time_position", "last_contact"]:

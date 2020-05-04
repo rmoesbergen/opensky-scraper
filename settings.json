@@ -8,8 +8,8 @@
   "username": "",
   "password": "",
   "max_geo_altitude": 12000,
-  "log_file": "/home/ronald/debug.log",
-  "csv_file": "/home/ronald/flights-%m.csv",
-  "history_file": "/home/ronald/history.json",
+  "log_file": "/home/pi/debug.log",
+  "csv_file": "/home/pi/flights-%m.csv",
+  "history_file": "/home/pi/history.json",
   "keep_history": 3600
 }

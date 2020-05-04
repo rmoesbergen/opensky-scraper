@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenSky Scraper
+After=network.target
+
+[Service]
+WorkingDirectory=/home/pi
+ExecStart=/usr/bin/python3 /home/pi/opensky-scraper.py
+KillMode=process
+Restart=on-failure
+User=pi
+Group=pi

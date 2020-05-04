@@ -78,7 +78,6 @@ class DeDuplicator:
             history_file.write(json.dumps(self.seen))
 
     def have_seen(self, flight):
-        print(self.seen)
         # Expire all records older than self.duration minutes
         to_remove = []
         for entry, dt in self.seen.items():

@@ -3,10 +3,10 @@
 
 import requests
 import json
+import csv
 from os import path
 from datetime import datetime, timedelta
 from time import sleep
-from csv import DictWriter
 
 
 class Settings:
@@ -49,7 +49,7 @@ class Flight:
         if item in ["time_position", "last_contact"]:
             timestamp = self.data[self.fields.get(item)]
             if timestamp is not None:
-                return datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%dZ%H:%M:%S')
+                return datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
 
         if item == 'keys':
             return self.fields.keys
@@ -102,7 +102,7 @@ class CsvLogger:
         filename = self.current_filename()
         write_header = not path.exists(filename)
         with open(filename, "a+") as csv_file:
-            writer = DictWriter(csv_file, fieldnames=Flight.fields.keys(), dialect='excel')
+            writer = csv.DictWriter(csv_file, fieldnames=Flight.fields.keys(), quoting=csv.QUOTE_NONNUMERIC)
             if write_header:
                 writer.writeheader()
             writer.writerow(flight)

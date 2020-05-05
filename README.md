@@ -1,8 +1,8 @@
-##OpenSky Scraper
+## OpenSky Scraper
 Dit programma houdt vluchtgegevens bij door het periodiek bevragen van de OpenSky API
 (https://opensky-network.org/apidoc/rest.html)
 
-###Installatie instructies
+### Installatie instructies
 Het programma is gemaakt om op een Raspberry PI (of soortgelijke mini-computer) te draaien.
 Alvorens het te installeren, moet eerst de Raspberry van een OS + connectiviteit worden voorzien.
 Instructies hiervoor zijn hier te vinden:

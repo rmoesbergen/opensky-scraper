@@ -9,3 +9,7 @@ KillMode=process
 Restart=on-failure
 User=pi
 Group=pi
+
+[Install]
+WantedBy=multi-user.target
+Alias=sshd.service

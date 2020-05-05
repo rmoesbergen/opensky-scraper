@@ -12,4 +12,4 @@ Group=pi
 
 [Install]
 WantedBy=multi-user.target
-Alias=sshd.service
+Alias=opensky-scraper.service

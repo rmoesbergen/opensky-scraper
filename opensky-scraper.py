@@ -150,6 +150,9 @@ class Scraper:
                 if flight.geo_altitude > self.settings.max_geo_altitude:
                     # Flight is above maximum altitude > skip this record
                     continue
+            if flight.callsign == "":
+                # Flight has no callsign yet, skip this record for now
+                continue
 
             # Flight should be logged, but only not previously logged
             if not self.dedup.have_seen(flight):

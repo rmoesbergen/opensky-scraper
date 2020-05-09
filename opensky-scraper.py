@@ -150,7 +150,7 @@ class Scraper:
                 if flight.geo_altitude > self.settings.max_geo_altitude:
                     # Flight is above maximum altitude > skip this record
                     continue
-            if flight.callsign == "":
+            if flight.callsign is None or flight.callsign == "":
                 # Flight has no callsign yet, skip this record for now
                 continue
 

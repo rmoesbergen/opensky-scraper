@@ -60,6 +60,14 @@ class Flight:
         for field in self.fields.keys():
             yield field, self.__getattr__(field)
 
+    def _get_altitude(self):
+        altitude = self.get('geo_altitude', None)
+        if altitude is None:
+            altitude = self.get('baro_altitude', None)
+        return altitude
+
+    altitude = property(_get_altitude)
+
 
 # Remember flight codes for 'duration' seconds
 class DeDuplicator:
@@ -146,8 +154,8 @@ class Scraper:
         for flight_data in flights['states']:
             flight = Flight(flight_data)
             # Check and filter altitude
-            if flight.geo_altitude is not None:
-                if flight.geo_altitude > self.settings.max_geo_altitude:
+            if flight.altitude is not None:
+                if flight.altitude > self.settings.max_geo_altitude:
                     # Flight is above maximum altitude > skip this record
                     continue
             if flight.callsign is None or flight.callsign == "":

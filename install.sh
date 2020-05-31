@@ -2,7 +2,7 @@
 #
 
 sudo apt-get -yy update
-sudo apt-get -yy install python3-requests
+sudo apt-get -yy install python3-requests python3-tz
 
 wget https://raw.githubusercontent.com/rmoesbergen/opensky-scraper/master/opensky-scraper.py -O /home/pi/opensky-scraper.py
 wget https://raw.githubusercontent.com/rmoesbergen/opensky-scraper/master/opensky-scraper.service -O /home/pi/opensky-scraper.service

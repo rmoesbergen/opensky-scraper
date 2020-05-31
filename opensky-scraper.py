@@ -4,8 +4,9 @@
 import requests
 import json
 import csv
+import pytz
 from os import path
-from datetime import datetime, timedelta
+from datetime import datetime
 from time import sleep
 
 
@@ -49,7 +50,8 @@ class Flight:
         if item in ["time_position", "last_contact"]:
             timestamp = self.data[self.fields.get(item)]
             if timestamp is not None:
-                return datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+                dt = datetime.fromtimestamp(timestamp, pytz.timezone('Europe/Amsterdam'))
+                return dt.strftime('%Y-%m-%d %H:%M:%S')
 
         if item == 'keys':
             return self.fields.keys

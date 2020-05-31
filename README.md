@@ -72,6 +72,12 @@ optional arguments:
   --wwxpath WWXPATH  Directory waar WWX bestanden zijn opgeslagen die
                      overeenkomen met de vluchtinfo CSV
 ```
+Een voorbeeld:
+
+```bash
+./db-convert.py --input flights-05.csv --output flights-dba.csv --wwxpath /home/pi/wwx
+```
+
 
 ### Functionaliteit
 De tool leest een flighs.csv bestand zoals door de opensky-scraper wordt geschreven.

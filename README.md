@@ -52,3 +52,32 @@ van vluchten te voorkomen. Het formaat is in JSON en bevat alle icao24 codes en 
 Bij het herstarten van het programma zal deze historie weer worden ingelezen, zodat vluchten nooit dubbel worden geschreven in de CSV file.
 - keep_history: Hoe lang het programma de vluchten 'onthoudt' in de history file, om te ontdubbelen, in seconden.
 Als een vlucht binnen dit interval 2 of meer keer wordt 'gezien', zal er maar 1 record worden geschreven in de CSV file.
+
+
+## Matchtool voor WWX bestanden
+
+### Hoe te gebruiken
+
+```bash
+usage: db-convert.py [-h] --input INPUT --output OUTPUT --wwxpath WWXPATH
+
+Match en conversie tool voor vluchtinformatie en WWX bestanden
+
+optional arguments:
+  -h, --help         show this help message and exit
+  --input INPUT      CSV bestand met vluchtinformatie zoals geschreven door
+                     opensky-scraper
+  --output OUTPUT    CSV bestand waarin vluchtinfo met dBA waarden geschreven
+                     wordt
+  --wwxpath WWXPATH  Directory waar WWX bestanden zijn opgeslagen die
+                     overeenkomen met de vluchtinfo CSV
+```
+
+### Functionaliteit
+De tool leest een flighs.csv bestand zoals door de opensky-scraper wordt geschreven.
+Voor elke vlucht in dit bestand wordt in een directory met WWX files de bijbehorende WWX
+file erbij gezocht (op basis van datum in de bestandsnaam). Vervolgens worden van alle dBA waarden
+rond het vlucht-tijdstip (2 minuten ervoor + erna) de hoogste waarde opgezocht, en toegevoegd aan
+het vlucht-record. Daarna wordt de output met dBA info naar een nieuwe CSV file geschreven.
+
+Zie 'Hoe te gebruiken' voor de aanroep.

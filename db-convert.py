@@ -84,6 +84,7 @@ class Converter:
                     'dba': 0,
                     'overflight': False
                 })
+                print(f"Warning: No WWX file found for date {file_date} in directory {self.wwx_directory}")
                 self.csv_writer.log(flight)
                 continue
 

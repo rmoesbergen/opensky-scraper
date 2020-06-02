@@ -66,13 +66,13 @@ class AudioDatabase:
         return db
 
 
-class Converter:
+class Matcher:
     def __init__(self, config):
         self.source_file = config.input
         self.wwx_directory = config.wwxpath
         self.csv_writer = CsvLogger(config.output)
 
-    def convert(self):
+    def match(self):
         for flight in FlightsReader(self.source_file):
             dt = datetime.strptime(flight['time_position'], '%Y-%m-%d %H:%M:%S')
             file_date = dt.strftime('%Y%m%d')
@@ -102,16 +102,38 @@ class Converter:
             self.csv_writer.log(flight)
 
 
+class Converter:
+    def __init__(self, config):
+        self.config = config
+
+    def convert(self):
+        audio = AudioDatabase(self.config.input)
+        csv_writer = CsvLogger(self.config.output)
+        for index, sample in audio.db.items():
+            csv_writer.log(sample)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Match en conversie tool voor vluchtinformatie en WWX bestanden')
-    parser.add_argument('--input', help='CSV bestand met vluchtinformatie zoals geschreven door opensky-scraper',
+    subparsers = parser.add_subparsers(title='acties', help='Uit te voeren actie', dest='action')
+    match_parser = subparsers.add_parser('match')
+    match_parser.add_argument('--input', help='CSV bestand met vluchtinformatie zoals geschreven door opensky-scraper',
                         required=True)
-    parser.add_argument('--output', help='CSV bestand waarin vluchtinfo met dBA waarden geschreven wordt',
+    match_parser.add_argument('--output', help='CSV bestand waarin vluchtinfo met dBA waarden geschreven wordt',
                         required=True)
-    parser.add_argument('--wwxpath',
+    match_parser.add_argument('--wwxpath',
                         help='Directory waar WWX bestanden zijn opgeslagen die overeenkomen met de vluchtinfo CSV',
                         required=True)
+
+    convert_parser = subparsers.add_parser('convert')
+    convert_parser.add_argument('--input', help='WWX bestand om te converteren naar CSV formaat', required=True)
+    convert_parser.add_argument('--output', help='CSV bestand voor schrijven van geconverteerde WWX data', required=True)
+
     config = parser.parse_args()
 
-    converter = Converter(config)
-    converter.convert()
+    if config.action == 'convert':
+        converter = Converter(config)
+        converter.convert()
+    else:
+        matcher = Matcher(config)
+        matcher.match()

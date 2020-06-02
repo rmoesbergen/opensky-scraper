@@ -59,9 +59,21 @@ Als een vlucht binnen dit interval 2 of meer keer wordt 'gezien', zal er maar 1 
 ### Hoe te gebruiken
 
 ```bash
-usage: db-convert.py [-h] --input INPUT --output OUTPUT --wwxpath WWXPATH
+usage: db-convert.py [-h] {match,convert} ...
 
 Match en conversie tool voor vluchtinformatie en WWX bestanden
+
+optional arguments:
+  -h, --help       show this help message and exit
+
+acties:
+  {match,convert}  Uit te voeren actie
+```
+
+Match mode:
+```
+usage: db-convert.py match [-h] --input INPUT --output OUTPUT --wwxpath
+                           WWXPATH
 
 optional arguments:
   -h, --help         show this help message and exit
@@ -72,10 +84,26 @@ optional arguments:
   --wwxpath WWXPATH  Directory waar WWX bestanden zijn opgeslagen die
                      overeenkomen met de vluchtinfo CSV
 ```
-Een voorbeeld:
+WWX file conversie mode:
 
 ```bash
-./db-convert.py --input flights-05.csv --output flights-dba.csv --wwxpath /home/pi/wwx
+usage: db-convert.py convert [-h] --input INPUT --output OUTPUT
+
+optional arguments:
+  -h, --help       show this help message and exit
+  --input INPUT    WWX bestand om te converteren naar CSV formaat
+  --output OUTPUT  CSV bestand voor schrijven van geconverteerde WWX data
+```
+
+Een voorbeeld van match mode (dba info zoeken bij vluchtinfo):
+
+```bash
+./db-convert.py match --input flights-05.csv --output flights-dba.csv --wwxpath /home/pi/wwx
+```
+Een voorbeeld van convert mode (WWX file converteren naar CSV):
+
+```bash
+./db-convert.py convert --input 611-20200531-001.wwx --output 611-2020531-001.csv
 ```
 
 

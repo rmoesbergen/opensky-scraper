@@ -87,11 +87,23 @@ class Matcher:
         self.wwx_directory = config.wwxpath
         self.csv_writer = CsvLogger(config.output)
 
+    @staticmethod
+    def add_empty_dba_info(flight):
+        for station in range(1, config.max_stations+1):
+            station_id = str(station).zfill(3)
+            flight.update(
+                {
+                    f'tijd-{station_id}': '00:00',
+                    f'dba-{station_id}': 0
+                }
+            )
+        return flight
+
     def match(self):
         for flight in FlightsReader(self.source_file):
             dt = datetime.strptime(flight['time_position'], '%Y-%m-%d %H:%M:%S')
             file_date = dt.strftime('%Y%m%d')
-            wwx_filenames = glob.glob(f'{self.wwx_directory}/*{file_date}-*.wwx')
+            wwx_filenames = sorted(glob.glob(f'{self.wwx_directory}/*{file_date}-*.wwx'))
 
             if len(wwx_filenames) == 0:
                 # No WWX file found for this flight
@@ -99,6 +111,7 @@ class Matcher:
                 self.csv_writer.log(flight)
                 continue
 
+            flight = self.add_empty_dba_info(flight)
             for filename in wwx_filenames:
                 audio = AudioDatabase(filename)
                 time_index_start = (dt - datetime(dt.year, dt.month, dt.day, 0, 0, 0)).seconds - TIME_RANGE
@@ -133,6 +146,8 @@ if __name__ == '__main__':
     match_parser.add_argument('--wwxpath',
                               help='Directory waar WWX bestanden zijn opgeslagen die overeenkomen met de vluchtinfo CSV',
                               required=True)
+    match_parser.add_argument('--max-stations', help='Maximaal aantal meetstations waarvoor WWX bestanden beschikbaar zijn',
+                              default=16, dest='max_stations')
 
     convert_parser = subparsers.add_parser('convert')
     convert_parser.add_argument('--input', help='WWX bestand om te converteren naar CSV formaat', required=True)

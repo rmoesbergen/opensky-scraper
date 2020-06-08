@@ -56,8 +56,14 @@ class AudioDatabase:
         start_time = datetime(hour=0, minute=0, second=0, year=2020, day=1, month=1)
         return {
             f"tijd": (start_time + timedelta(seconds=index)).strftime("%H:%M:%S"),
-            f"dba": self.samples[index]
+            f"dba": self.get_sample(index)
         }
+
+    def get_sample(self, index):
+        sample = self.samples[index]
+        if sample >= 128:
+            sample -= 128
+        return sample
 
     def _read_db_file(self):
         with open(self.filename, "rb") as database:
@@ -68,8 +74,8 @@ class AudioDatabase:
         # Scan through all the audio samples for this time range, find the max value
         max_dba_index = 0
         for index in range(timerange_start, timerange_end):
-            sample = self.samples[index]
-            if sample > self.samples[max_dba_index]:
+            sample = self.get_sample(index)
+            if sample > self.get_sample(max_dba_index):
                 max_dba_index = index
 
         return self.sample_to_dict(max_dba_index)

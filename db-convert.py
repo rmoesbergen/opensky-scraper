@@ -6,8 +6,9 @@ from os import path
 import argparse
 import glob
 import csv
+import functools
 
-TIME_RANGE = 120
+TIME_RANGE = 180
 
 
 class FlightsReader:
@@ -43,27 +44,35 @@ class CsvLogger:
 class AudioDatabase:
     def __init__(self, filename):
         self.filename = filename
-        self.db = self._read_db_file()
+        self.samples = self._read_db_file()
+
+    @property
+    @functools.lru_cache()
+    def station_id(self):
+        fn = self.filename.lower().replace('.wwx', '')
+        return fn.split('-')[-1]
+
+    def sample_to_dict(self, index):
+        start_time = datetime(hour=0, minute=0, second=0, year=2020, day=1, month=1)
+        return {
+            f"tijd": (start_time + timedelta(seconds=index)).strftime("%H:%M:%S"),
+            f"dba": self.samples[index]
+        }
 
     def _read_db_file(self):
-        db = {}
         with open(self.filename, "rb") as database:
             samples = database.read()
-            samples = samples[0:86400]
-            start_time = datetime(hour=0, minute=0, second=0, year=2020, day=1, month=1)
-            for index in range(0, 86400):
-                sample = samples[index]
-                overflight = False
-                if sample > 128:
-                    overflight = True
-                    sample -= 128
+        return samples
 
-                db[index] = {
-                    "tijd": (start_time + timedelta(seconds=index)).strftime("%H:%M:%S"),
-                    "dba": sample,
-                    "overflight": overflight
-                }
-        return db
+    def find_highest_sample(self, timerange_start, timerange_end):
+        # Scan through all the audio samples for this time range, find the max value
+        max_dba_index = 0
+        for index in range(timerange_start, timerange_end):
+            sample = self.samples[index]
+            if sample > self.samples[max_dba_index]:
+                max_dba_index = index
+
+        return self.sample_to_dict(max_dba_index)
 
 
 class Matcher:
@@ -76,29 +85,23 @@ class Matcher:
         for flight in FlightsReader(self.source_file):
             dt = datetime.strptime(flight['time_position'], '%Y-%m-%d %H:%M:%S')
             file_date = dt.strftime('%Y%m%d')
-            wwx_filenames = glob.glob(f'{self.wwx_directory}/*-{file_date}-*.wwx')
-            if len(wwx_filenames) != 1:
+            wwx_filenames = glob.glob(f'{self.wwx_directory}/*{file_date}-*.wwx')
+
+            if len(wwx_filenames) == 0:
                 # No WWX file found for this flight
-                flight.update({
-                    'tijd': '00:00',
-                    'dba': 0,
-                    'overflight': False
-                })
                 print(f"Warning: No WWX file found for date {file_date} in directory {self.wwx_directory}")
                 self.csv_writer.log(flight)
                 continue
 
-            audio = AudioDatabase(wwx_filenames[0])
-            time_index_start = (dt - datetime(dt.year, dt.month, dt.day, 0, 0, 0)).seconds - TIME_RANGE
+            for filename in wwx_filenames:
+                audio = AudioDatabase(filename)
+                time_index_start = (dt - datetime(dt.year, dt.month, dt.day, 0, 0, 0)).seconds - TIME_RANGE
+                sample = audio.find_highest_sample(time_index_start, time_index_start + 2 * TIME_RANGE)
+                flight.update({
+                    f'tijd-{audio.station_id}': sample['tijd'],
+                    f'dba-{audio.station_id}': sample['dba']
+                })
 
-            # Scan through all the audio samples for this time range, find the max value
-            max_dba_index = 0
-            for index in range(time_index_start, time_index_start + 2 * TIME_RANGE):
-                sample = audio.db[index]['dba']
-                if sample > audio.db[max_dba_index]['dba']:
-                    max_dba_index = index
-
-            flight.update(audio.db[max_dba_index])
             self.csv_writer.log(flight)
 
 
@@ -109,8 +112,8 @@ class Converter:
     def convert(self):
         audio = AudioDatabase(self.config.input)
         csv_writer = CsvLogger(self.config.output)
-        for index, sample in audio.db.items():
-            csv_writer.log(sample)
+        for index in range(0, 86400):
+            csv_writer.log(audio.sample_to_dict(index))
 
 
 if __name__ == '__main__':
@@ -118,12 +121,12 @@ if __name__ == '__main__':
     subparsers = parser.add_subparsers(title='acties', help='Uit te voeren actie', dest='action')
     match_parser = subparsers.add_parser('match')
     match_parser.add_argument('--input', help='CSV bestand met vluchtinformatie zoals geschreven door opensky-scraper',
-                        required=True)
+                              required=True)
     match_parser.add_argument('--output', help='CSV bestand waarin vluchtinfo met dBA waarden geschreven wordt',
-                        required=True)
+                              required=True)
     match_parser.add_argument('--wwxpath',
-                        help='Directory waar WWX bestanden zijn opgeslagen die overeenkomen met de vluchtinfo CSV',
-                        required=True)
+                              help='Directory waar WWX bestanden zijn opgeslagen die overeenkomen met de vluchtinfo CSV',
+                              required=True)
 
     convert_parser = subparsers.add_parser('convert')
     convert_parser.add_argument('--input', help='WWX bestand om te converteren naar CSV formaat', required=True)
@@ -134,6 +137,8 @@ if __name__ == '__main__':
     if config.action == 'convert':
         converter = Converter(config)
         converter.convert()
-    else:
+    elif config.action == 'match':
         matcher = Matcher(config)
         matcher.match()
+    else:
+        parser.print_help()

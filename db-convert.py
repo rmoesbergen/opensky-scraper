@@ -74,8 +74,8 @@ class AudioDatabase:
         # Scan through all the audio samples for this time range, find the max value
         if timerange_start < 0:
             timerange_start = 0
-        if timerange_end >= 86400:
-            timerange_end = 86399
+        if timerange_end > 86400:
+            timerange_end = 86400
 
         max_dba_index = 0
         for index in range(timerange_start, timerange_end):

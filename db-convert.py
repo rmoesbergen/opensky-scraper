@@ -152,7 +152,7 @@ if __name__ == '__main__':
                               help='Directory waar WWX bestanden zijn opgeslagen die overeenkomen met de vluchtinfo CSV',
                               required=True)
     match_parser.add_argument('--max-stations', help='Maximaal aantal meetstations waarvoor WWX bestanden beschikbaar zijn',
-                              default=16, dest='max_stations')
+                              default=18, dest='max_stations', type=int)
 
     convert_parser = subparsers.add_parser('convert')
     convert_parser.add_argument('--input', help='WWX bestand om te converteren naar CSV formaat', required=True)

@@ -1,0 +1,15 @@
+{
+  "api_url": "https://opensky-network.org/api",
+  "lamin": "50.537535",
+  "lomin": "5.323190",
+  "lamax": "51.2140",
+  "lomax": "6.1767",
+  "poll_interval": 15,
+  "username": "",
+  "password": "",
+  "max_geo_altitude": 1000,
+  "log_file": "/home/pi/debug-luik.log",
+  "csv_file": "/home/pi/flights-luik-%m.csv",
+  "history_file": "/home/pi/history-luik.json",
+  "keep_history": 1800
+}

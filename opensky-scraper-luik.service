@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenSky Scraper Luik
+After=network.target
+
+[Service]
+WorkingDirectory=/home/pi
+ExecStart=/usr/bin/python3 /home/pi/opensky-scraper.py --configfile=/home/pi/settings-luik.json
+KillMode=process
+Restart=on-failure
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target
+Alias=opensky-scraper-luik.service

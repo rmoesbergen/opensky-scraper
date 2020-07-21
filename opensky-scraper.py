@@ -5,14 +5,15 @@ import requests
 import json
 import csv
 import pytz
+import argparse
 from os import path
 from datetime import datetime
 from time import sleep
 
 
 class Settings:
-    def __init__(self):
-        with open("settings.json", "r") as settings_file:
+    def __init__(self, filename="settings.json"):
+        with open(filename, "r") as settings_file:
             self.settings = json.load(settings_file)
 
     def __getattr__(self, item):
@@ -128,8 +129,8 @@ class FileLogger:
 
 
 class Scraper:
-    def __init__(self):
-        self.settings = Settings()
+    def __init__(self, configfile):
+        self.settings = Settings(configfile)
         self.log = FileLogger(self.settings.log_file)
         self.csv = CsvLogger(self.settings.csv_file)
         self.dedup = DeDuplicator(self.settings.history_file, self.settings.keep_history)
@@ -176,5 +177,9 @@ class Scraper:
 
 
 if __name__ == '__main__':
-    scraper = Scraper()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--configfile', help='Path to configuration JSON file', default='settings.json')
+    config = parser.parse_args()
+
+    scraper = Scraper(config.configfile)
     scraper.run()

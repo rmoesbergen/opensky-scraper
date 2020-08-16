@@ -164,6 +164,9 @@ class Scraper:
             if flight.callsign is None or flight.callsign == "":
                 # Flight has no callsign yet, skip this record for now
                 continue
+            if flight.on_ground:
+                # Flight has not yet departed, skip
+                continue
 
             # Flight should be logged, but only not previously logged
             if not self.dedup.have_seen(flight):

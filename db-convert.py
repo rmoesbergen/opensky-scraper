@@ -106,7 +106,8 @@ class Matcher:
 
     def match(self):
         for flight in FlightsReader(self.source_file):
-            dt = datetime.strptime(flight['time_position'], '%Y-%m-%d %H:%M:%S')
+            text_dt = flight['time_position'] if 'time_position' in flight else flight['uti']
+            dt = datetime.strptime(text_dt, '%Y-%m-%d %H:%M:%S')
             file_date = dt.strftime('%Y%m%d')
             wwx_filenames = sorted(glob.glob(f'{self.wwx_directory}/*{file_date}-*.wwx'))
 

@@ -124,8 +124,9 @@ class FileLogger:
         self.filename = filename
 
     def log(self, text):
-        with open(self.filename, "a+") as logfile:
-            logfile.write(text + "\n")
+        if self.filename is not None and self.filename != "":
+            with open(self.filename, "a+") as logfile:
+                logfile.write(text + "\n")
 
 
 class Scraper:

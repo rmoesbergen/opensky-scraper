@@ -34,8 +34,8 @@ class CsvLogger:
     def log(self, flight):
         filename = self.current_filename()
         write_header = not path.exists(filename)
-        with open(filename, "a+") as csv_file:
-            writer = csv.DictWriter(csv_file, fieldnames=flight.keys(), quoting=csv.QUOTE_NONNUMERIC)
+        with open(filename, "a+", newline='') as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=flight.keys(), quoting=csv.QUOTE_NONNUMERIC, )
             if write_header:
                 writer.writeheader()
             writer.writerow(flight)

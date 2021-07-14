@@ -25,20 +25,17 @@ class FlightsReader:
 class CsvLogger:
     # Filename can contain datetime format specifiers like %M
     def __init__(self, filename):
-        self.filename = filename
-
-    def current_filename(self):
-        return datetime.now().strftime(self.filename)
+        filename = datetime.now().strftime(filename)
+        self.write_header = not path.exists(filename)
+        self.csv_file = open(filename, "a+", newline='')
 
     # Logs a Flight object to CSV
     def log(self, flight):
-        filename = self.current_filename()
-        write_header = not path.exists(filename)
-        with open(filename, "a+", newline='') as csv_file:
-            writer = csv.DictWriter(csv_file, fieldnames=flight.keys(), quoting=csv.QUOTE_NONNUMERIC, )
-            if write_header:
-                writer.writeheader()
-            writer.writerow(flight)
+        writer = csv.DictWriter(self.csv_file, fieldnames=flight.keys(), quoting=csv.QUOTE_NONNUMERIC)
+        if self.write_header:
+            writer.writeheader()
+            self.write_header = False
+        writer.writerow(flight)
 
 
 class AudioDatabase:
